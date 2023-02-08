@@ -40,7 +40,54 @@ puts "
     XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO    
     \n"
 module GameBoard
-  @@board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']    
+  @@board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+  def display_board()
+    puts " #{@@board[0]} | #{@@board[1]} | #{@@board[2]} "
+    puts "-----------"
+    puts " #{@@board[3]} | #{@@board[4]} | #{@@board[5]} "
+    puts "-----------"
+    puts " #{@@board[6]} | #{@@board[7]} | #{@@board[8]} "
+  end
+  # def is_win?()
+  #   board = @@board
+  #   if board[0..2] = "X"
+  #     puts "Player one wins!"
+  #   else
+  #     puts "eee"
+  #   end
+  # end 
+  def player_one_move()
+    "Type the position of where you are placing your token:"
+    move = gets.chomp
+    move = (move.to_i - 1)
+    @@board[move] = "X"
+  end
+  def player_two_move()
+    "Type the position of where you are placing your token:"
+    move = gets.chomp
+    move = (move.to_i - 1)
+    @@board[move] = "O"
+  end
+  def turn_taker()
+    turn_counter = 0
+    until (turn_counter > 9) do
+      if turn_counter % 2 == 0
+        play = "X"
+        puts play
+        turn_counter += 1
+        puts "Your turn Player 1.\n"
+        player_one_move()
+        display_board()
+      elsif turn_counter % 2 != 0
+        play = "O"
+        puts play
+        turn_counter += 1
+        puts "Your turn Player 2.\n"
+        player_two_move()
+        display_board()
+      end
+    end
+  end
 end
 
 class Player
@@ -63,6 +110,7 @@ class TicTacToe
   end
   
   def start_game(board)
+    board = @@board
     puts " #{board[0]} | #{board[1]} | #{board[2]} "
     puts "-----------"
     puts " #{board[3]} | #{board[4]} | #{board[5]} "
@@ -73,6 +121,7 @@ end
 
 
 class TheGame
+  include GameBoard
   def play_a_round()
     
     puts "Player 1, please enter your name:\n"
@@ -87,26 +136,10 @@ class TheGame
     play_game.start_game(board)
     turn_taker()
   end
-
-  def turn_taker
-    turn_counter = 0
-    until turn_counter > 9 do
-      if turn_counter % 2 = 0
-        play = player_one.token
-        puts play
-        turn_counter += 1
-        puts "Your turn Player 1.\n"
-      elsif turn_counter % 2 != 0
-        play = player_two.token
-        put play
-        turn_counter += 1
-        puts "Your turn Player 2.\n"
-      end
-    end
-  end
 end
 
 
 
 
 play_it = TheGame.new()
+play_it.play_a_round()
