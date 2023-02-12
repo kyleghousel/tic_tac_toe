@@ -74,7 +74,7 @@ class TicTacToe
           display_board
           puts "It's a draw."
           break
-        else
+        else #If true, then player_2 is returned as the new current player. If false, then player_1 is returned as the new current player.
           current_player = current_player == player_1 ? player_2 : player_1
         end
       else
