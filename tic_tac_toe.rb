@@ -39,107 +39,97 @@ puts "
     XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO
     XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO    
     \n"
-module GameBoard
-  @@board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
-  def display_board()
-    puts " #{@@board[0]} | #{@@board[1]} | #{@@board[2]} "
-    puts "-----------"
-    puts " #{@@board[3]} | #{@@board[4]} | #{@@board[5]} "
-    puts "-----------"
-    puts " #{@@board[6]} | #{@@board[7]} | #{@@board[8]} "
-  end
-  # def is_win?()
-  #   board = @@board
-  #   if board[0..2] = "X"
-  #     puts "Player one wins!"
-  #   else
-  #     puts "eee"
-  #   end
-  # end 
-  def player_one_move()
-    "Type the position of where you are placing your token:"
-    move = gets.chomp
-    move = (move.to_i - 1)
-    @@board[move] = "X"
-  end
-  def player_two_move()
-    "Type the position of where you are placing your token:"
-    move = gets.chomp
-    move = (move.to_i - 1)
-    @@board[move] = "O"
-  end
-  def turn_taker()
-    turn_counter = 0
-    until (turn_counter > 9) do
-      if turn_counter % 2 == 0
-        play = "X"
-        puts play
-        turn_counter += 1
-        puts "Your turn Player 1.\n"
-        player_one_move()
-        display_board()
-      elsif turn_counter % 2 != 0
-        play = "O"
-        puts play
-        turn_counter += 1
-        puts "Your turn Player 2.\n"
-        player_two_move()
-        display_board()
-      end
-    end
-  end
-end
-
-class Player
-  include GameBoard
-  attr_reader :player, :token
-  @@player_number
-  def initialize(player, token)
-    @player = player
-    @token = token
-  end
-end
 
 class TicTacToe
-  include GameBoard
-  attr_accessor
-  @@game_counter = 0
-  def initialize(player_one, player_two)
-    puts "Time to play! >:)"
-    @@game_counter += 1
+  attr_reader :board, :player_1, :player_2
+
+  def initialize
+    @board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+    @player_1 = Player.new("X")
+    @player_2 = Player.new("O")
+    @score = { player_1.marker => 0, player_2.marker => 0 }
   end
-  
-  def start_game(board)
-    board = @@board
+
+  def display_board
     puts " #{board[0]} | #{board[1]} | #{board[2]} "
     puts "-----------"
     puts " #{board[3]} | #{board[4]} | #{board[5]} "
     puts "-----------"
     puts " #{board[6]} | #{board[7]} | #{board[8]} "
   end
-end
 
+  def play
+    current_player = player_1
+    loop do
+      display_board
+      puts "#{current_player.marker}'s turn. Choose a position (1-9) to place your marker."
+      position = gets.chomp.to_i
+      if board[position - 1] == ' '
+        board[position - 1] = current_player.marker
+        if win?(current_player.marker)
+          display_board
+          puts "#{current_player.marker} wins!"
+          break
+        elsif draw?
+          display_board
+          puts "It's a draw."
+          break
+        else
+          current_player = current_player == player_1 ? player_2 : player_1
+        end
+      else
+        puts "Position already taken. Choose another position."
+      end
+    end
+    new_game
+  end
 
-class TheGame
-  include GameBoard
-  def play_a_round()
-    
-    puts "Player 1, please enter your name:\n"
-    player_one = Player.new(gets.chomp, "X")
-    puts "Welcome, #{player_one.player}, you are playing as X.\n"
-    puts "Player 2, please enter your name:\n"
-    player_two = Player.new(gets.chomp, "O")
-    puts "Welcome, #{player_two.player}, you are playing as O.\n"
-    
-    play_game = TicTacToe.new(player_one, player_two)
-    board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']   
-    play_game.start_game(board)
-    turn_taker()
+  private
+
+  WINNING_COMBOS = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ]
+
+  def win?(marker)
+    WINNING_COMBOS.any? do |combo|
+      combo.all? { |index| board[index] == marker }
+    end
+  end
+
+  def draw?
+    board.none? { |square| square == ' ' }
+  end
+
+  def new_game
+    puts "Would you like to play again? (yes/no)"
+    response = gets.chomp.downcase
+    if response == "yes"
+      @board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+      play
+    elsif response == "no"
+      puts "Thanks for playing!"
+      exit
+    else
+      puts "Invalid response. Please type 'yes' or 'no'."
+      new_game
+    end
   end
 end
 
+class Player
+  attr_reader :marker
 
+  def initialize(marker)
+    @marker = marker
+  end
+end
 
-
-play_it = TheGame.new()
-play_it.play_a_round()
+game = TicTacToe.new
+game.play
